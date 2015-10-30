@@ -59,7 +59,7 @@ static NSMutableDictionary * subscribedVCPool;
         instance.client = [PTPusher pusherWithKey:PUSHER_KEY_IDENTIFIER
                                          delegate:instance];
         
-        //instance.client.authorizationURL = [WEURLFactory authorizationPusherURL];
+        instance.client.authorizationURL = [NSURL URLWithString:@""];
     }
     
     if (![[instance.client connection] isConnected]) {
@@ -116,9 +116,6 @@ static NSMutableDictionary * subscribedVCPool;
 
 - (void)pusher:(PTPusher *)pusher connectionDidConnect:(PTPusherConnection *)connection
 {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Success"
-                                                                   message:@"You are connected to pusher!!!"
-                                                            preferredStyle:UIAlertControllerStyleAlert];
     NSLog(@"Connection Suceeded");
 }
 
@@ -127,7 +124,8 @@ static NSMutableDictionary * subscribedVCPool;
     if (!self.shouldReconnectToPusher) {
         for (NSString *weevIdentifier in [subscribedVCPool allKeys]) {
             
-            for (UIViewController *vc in subscribedVCPool[weevIdentifier]) {
+            for (UIViewController<PusherViewControllerDelegate> *vc in subscribedVCPool[weevIdentifier]) {
+                [vc connectionLostWithError:error.localizedDescription];
             }
         }
         
@@ -150,7 +148,7 @@ static NSMutableDictionary * subscribedVCPool;
 
 - (void)pusher:(PTPusher *)pusher willAuthorizeChannel:(PTPusherChannel *)channel withRequest:(NSMutableURLRequest *)request
 {
-    //[request setValue:[WERestAPI sharedInstance].accessToken forHTTPHeaderField:@"auth-token"];
+    [request setValue:@"cds-development" forHTTPHeaderField:@"auth-token"];
 }
 
 - (void)pusher:(PTPusher *)pusher didSubscribeToChannel:(PTPusherChannel *)channel
@@ -160,90 +158,26 @@ static NSMutableDictionary * subscribedVCPool;
     [channel bindToEventNamed:@"redcard"
               handleWithBlock:^(PTPusherEvent *channelEvent) {
                   
-                  for (NSString *matchIdentifier in [openChannelsPool allKeys]) {
-                      PTPusherPrivateChannel *auxChannel = openChannelsPool[matchIdentifier];
-                      
-                      if ([channelEvent.channel isEqualToString:auxChannel.name]) {
-                          Match *match = [Match matchWithId:matchIdentifier];
-                          
-                          if (channelEvent.data[@"responses"]) {
-                          }
-                          
-                          if ([channelEvent.data objectForKey:@"userId"]) {
-                              
-                              
-                          } else {
-                              
-                          }
-                          
-                      }
-                  }
+                  [Match addEvent:channelEvent.data];
+                  [[NSNotificationCenter defaultCenter] postNotificationName:@"newEvent" object:channelEvent.channel];
               }];
     [channel bindToEventNamed:@"yellowcard"
               handleWithBlock:^(PTPusherEvent *channelEvent) {
                   
-                  for (NSString *matchIdentifier in [openChannelsPool allKeys]) {
-                      PTPusherPrivateChannel *auxChannel = openChannelsPool[matchIdentifier];
-                      
-                      if ([channelEvent.channel isEqualToString:auxChannel.name]) {
-                          Match *match = [Match matchWithId:matchIdentifier];
-                          
-                          if (channelEvent.data[@"responses"]) {
-                          }
-                          
-                          if ([channelEvent.data objectForKey:@"userId"]) {
-                              
-                              
-                          } else {
-                              
-                          }
-                          
-                      }
-                  }
+                  [Match addEvent:channelEvent.data];
+                  [[NSNotificationCenter defaultCenter] postNotificationName:@"newEvent" object:channelEvent.channel];
               }];
     [channel bindToEventNamed:@"goal"
               handleWithBlock:^(PTPusherEvent *channelEvent) {
                   
-                  for (NSString *matchIdentifier in [openChannelsPool allKeys]) {
-                      PTPusherPrivateChannel *auxChannel = openChannelsPool[matchIdentifier];
-                      
-                      if ([channelEvent.channel isEqualToString:auxChannel.name]) {
-                          Match *match = [Match matchWithId:matchIdentifier];
-                          
-                          if (channelEvent.data[@"responses"]) {
-                          }
-                          
-                          if ([channelEvent.data objectForKey:@"userId"]) {
-                              
-                              
-                          } else {
-                              
-                          }
-                          
-                      }
-                  }
+                  [Match addEvent:channelEvent.data];
+                  [[NSNotificationCenter defaultCenter] postNotificationName:@"newEvent" object:channelEvent.channel];
               }];
     [channel bindToEventNamed:@"injury"
               handleWithBlock:^(PTPusherEvent *channelEvent) {
                   
-                  for (NSString *matchIdentifier in [openChannelsPool allKeys]) {
-                      PTPusherPrivateChannel *auxChannel = openChannelsPool[matchIdentifier];
-                      
-                      if ([channelEvent.channel isEqualToString:auxChannel.name]) {
-                          Match *match = [Match matchWithId:matchIdentifier];
-                          
-                          if (channelEvent.data[@"responses"]) {
-                          }
-                          
-                          if ([channelEvent.data objectForKey:@"userId"]) {
-                              
-                              
-                          } else {
-                              
-                          }
-                          
-                      }
-                  }
+                  [Match addEvent:channelEvent.data];
+                  [[NSNotificationCenter defaultCenter] postNotificationName:@"newEvent" object:channelEvent.channel];
               }];
 }
 

@@ -13,6 +13,7 @@
 @property (nonatomic) NSInteger team;
 @property (nonatomic) NSInteger minute;
 @property (nonatomic, strong) NSString *eventDescription;
+@property (nonatomic, strong) NSString *matchId;
 
 - (MatchEvent *)initWithDictionary:(NSDictionary *)dictionary;
 

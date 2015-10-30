@@ -10,6 +10,6 @@
 #import "Match.h"
 
 @interface MatchViewController : UIViewController
-@property (nonatomic, strong) Match *match;
+@property (nonatomic, strong) NSString *matchId;
 
 @end

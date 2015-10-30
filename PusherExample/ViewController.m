@@ -15,7 +15,7 @@
 @interface ViewController () <UITableViewDataSource, UITableViewDelegate>
 
 @property (nonatomic, weak) IBOutlet UITableView *matchsTableView;
-@property (nonatomic, strong) NSMutableArray *matchs;
+@property (weak, nonatomic) IBOutlet UILabel *latestEvent;
 
 @end
 
@@ -26,7 +26,17 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     [self.matchsTableView registerNib:[UINib nibWithNibName:@"MatchTableViewCell" bundle:nil] forCellReuseIdentifier:@"matchCell"];
-    [self loadMatches];
+    
+    __weak ViewController *wself = self;
+    
+    [[NSNotificationCenter defaultCenter] addObserverForName:@"newEvent"
+                                                      object:nil
+                                                       queue:[NSOperationQueue mainQueue]
+                                                  usingBlock:^(NSNotification * _Nonnull note) {
+                                                      Match *match = [Match matchWithId:((Match *)note.object).matchId];
+                                                      MatchEvent *event = match.events.lastObject;
+                                                      wself.latestEvent.text = [NSString stringWithFormat:@"Event: %@, min %i", event.eventDescription, (int)event.minute];
+                                                  }];
 }
 
 - (void)didReceiveMemoryWarning
@@ -35,16 +45,11 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)loadMatches
-{
-    self.matchs = [Match matchs];
-}
-
 #pragma mark - IBAction methods
 
 - (IBAction)generate:(id)sender
 {
-    NSArray *matchs = @[@"1",@"2",@"3",@"4"];
+    NSArray *matchs = @[@"M1",@"M2",@"M3",@"M4"];
     NSArray *events = @[@"goal",@"redcard",@"yellowcard",@"injury"];
     NSArray *descriptions = @[@"Torres",@"\"perro\" Zanetti",@"Cavani",@"Cacha",@"Julio Rios",@"Collazo",@"J Olivera",@"el otro",@"Luis Miguel",@"el 9"];
     NSDictionary *eventInfo = @{
@@ -90,17 +95,19 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return self.matchs.count;
+    return [Match matchs].count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     MatchTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"matchCell"];
     
-    Match *currentMatch = (Match *)[self.matchs objectAtIndex:indexPath.row];
+    Match *currentMatch = (Match *)[[Match matchs] objectAtIndex:indexPath.row];
     
     cell.matchName.text = [NSString stringWithFormat:@"%@ - %@", currentMatch.team1, currentMatch.team2];
     [cell.enableNotifications setOn:currentMatch.notificationsEnabled animated:YES];
+    cell.enableNotifications.tag = indexPath.row;
+    [cell.enableNotifications addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
     
     return cell;
 }
@@ -112,14 +119,35 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    [self performSegueWithIdentifier:@"events" sender:[self.matchs objectAtIndex:indexPath.row]];
+    [self performSegueWithIdentifier:@"events" sender:[[Match matchs] objectAtIndex:indexPath.row]];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(nullable id)sender
 {
     if ([segue.destinationViewController isKindOfClass:[MatchViewController class]]) {
-        ((MatchViewController *)segue.destinationViewController).match = (Match *)sender;
+        ((MatchViewController *)segue.destinationViewController).matchId = ((Match *)sender).matchId;
     }
+}
+
+- (IBAction)switchChanged:(UISwitch *)sender
+{
+    if (!sender.isOn) {
+        [[PusherController sharedInstance] unsubscribeToChannel:((Match *)[[Match matchs] objectAtIndex:sender.tag]).matchId
+                                                 viewController:self];
+    } else {
+        [[PusherController sharedInstance] subscribeToChannel:((Match *)[[Match matchs] objectAtIndex:sender.tag]).matchId
+                                               viewController:self];
+    }
+}
+
+#pragma mark - PusherViewControllerDelegate
+
+- (void)connectionLostWithError:(NSString *)errorMessage
+{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Sorry!"
+                                                                   message:errorMessage
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    [self.navigationController presentViewController:alert animated:YES completion:nil];
 }
 
 @end

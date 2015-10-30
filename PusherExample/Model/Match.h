@@ -18,8 +18,8 @@
 @property (nonatomic, strong) NSMutableArray *events;
 
 - (Match *)initWithId:(NSString *)matchId team1:(NSString *)team1 team2:(NSString *)team2 enabled:(BOOL)enabled;
-- (void)addEvent:(MatchEvent *)event;
 
++ (void)addEvent:(MatchEvent *)event;
 + (Match *)matchWithId:(NSString *)matchId;
 + (NSMutableArray *)matchs;
 

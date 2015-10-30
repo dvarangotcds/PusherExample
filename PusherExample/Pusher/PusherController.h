@@ -9,6 +9,14 @@
 #import <Foundation/Foundation.h>
 #import <Pusher/Pusher.h>
 #import <UIKit/UIKit.h>
+#import "MatchEvent.h"
+
+@protocol PusherViewControllerDelegate <NSObject>
+
+@required
+- (void)connectionLostWithError:(NSString *)errorMessage;
+
+@end
 
 @interface PusherController : NSObject <PTPusherDelegate>
 

@@ -23,26 +23,32 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.matchName.text = [NSString stringWithFormat:@"%@ - %@", self.match.team1, self.match.team2];
+    self.matchName.text = [NSString stringWithFormat:@"%@ - %@", [Match matchWithId:self.matchId].team1, [Match matchWithId:self.matchId].team2];
     
-}
-
-- (IBAction)generate:(id)sender
-{
+    __weak MatchViewController *wself = self;
+    
+    [[NSNotificationCenter defaultCenter] addObserverForName:@"newEvent"
+                                                      object:nil
+                                                       queue:[NSOperationQueue mainQueue]
+                                                  usingBlock:^(NSNotification * _Nonnull note) {
+                                                      if ([((Match *)note.object).matchId isEqualToString:wself.matchId]) {
+                                                          [wself.eventsTableView reloadData];
+                                                      }
+                                                  }];
 }
 
 #pragma mark - UITableViewDataSource methods
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return self.match.events.count;
+    return [Match matchWithId:self.matchId].events.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     EventTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"matchCell"];
     
-    MatchEvent *currentEvent = (MatchEvent *)[self.match.events objectAtIndex:indexPath.row];
+    MatchEvent *currentEvent = (MatchEvent *)[[Match matchWithId:self.matchId].events objectAtIndex:indexPath.row];
     
     cell.minuto.text = [NSString stringWithFormat:@"min %i", (int)currentEvent.minute];
     cell.eventDescription.text = currentEvent.eventDescription;
