@@ -8,13 +8,21 @@
 
 #import <Foundation/Foundation.h>
 
+typedef enum {
+    MatchEventTypeGoal,
+    MatchEventTypeRedCard,
+    MatchEventTypeYellowCard,
+    MatchEventTypeInjury
+} MatchEventType;
+
 @interface MatchEvent : NSObject
 
 @property (nonatomic) NSInteger team;
 @property (nonatomic) NSInteger minute;
 @property (nonatomic, strong) NSString *eventDescription;
 @property (nonatomic, strong) NSString *matchId;
+@property (nonatomic) MatchEventType eventType;
 
-- (MatchEvent *)initWithDictionary:(NSDictionary *)dictionary;
+- (MatchEvent *)initWithDictionary:(NSDictionary *)dictionary matchId:(NSString *)matchId eventType:(MatchEventType)eventType;
 
 @end

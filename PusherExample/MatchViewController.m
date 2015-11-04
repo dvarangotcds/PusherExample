@@ -27,14 +27,24 @@
     
     __weak MatchViewController *wself = self;
     
+    [self.eventsTableView registerNib:[UINib nibWithNibName:@"EventTableViewCell"
+                                                      bundle:nil]
+               forCellReuseIdentifier:@"eventCell"];
+    
     [[NSNotificationCenter defaultCenter] addObserverForName:@"newEvent"
                                                       object:nil
                                                        queue:[NSOperationQueue mainQueue]
                                                   usingBlock:^(NSNotification * _Nonnull note) {
-                                                      if ([((Match *)note.object).matchId isEqualToString:wself.matchId]) {
+                                                      if ([(NSString *)note.object isEqualToString:wself.matchId]) {
                                                           [wself.eventsTableView reloadData];
                                                       }
                                                   }];
+}
+
+
+- (IBAction)generate:(id)sender
+{
+    
 }
 
 #pragma mark - UITableViewDataSource methods
@@ -46,12 +56,22 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    EventTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"matchCell"];
+    EventTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"eventCell"];
     
     MatchEvent *currentEvent = (MatchEvent *)[[Match matchWithId:self.matchId].events objectAtIndex:indexPath.row];
     
-    cell.minuto.text = [NSString stringWithFormat:@"min %i", (int)currentEvent.minute];
+    cell.minute.text = [NSString stringWithFormat:@"min %i", (int)currentEvent.minute];
     cell.eventDescription.text = currentEvent.eventDescription;
+    
+    if (currentEvent.eventType == MatchEventTypeGoal) {
+        [cell.eventImage setImage:[UIImage imageNamed:@"goal"]];        
+    } else if (currentEvent.eventType == MatchEventTypeRedCard) {
+        [cell.eventImage setImage:[UIImage imageNamed:@"redcard"]];
+    } else if (currentEvent.eventType == MatchEventTypeYellowCard) {
+        [cell.eventImage setImage:[UIImage imageNamed:@"ywllowcard"]];
+    } else if (currentEvent.eventType == MatchEventTypeInjury) {
+        [cell.eventImage setImage:[UIImage imageNamed:@"Injury"]];
+    }
     
     return cell;
 }

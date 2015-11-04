@@ -76,7 +76,8 @@ static NSMutableDictionary * subscribedVCPool;
     
     if (openChannelsPool[channelIdentifier]) {
         //already have a channel for this weev
-        PTPusherPrivateChannel *channel = openChannelsPool[channelIdentifier];
+        PTPusherChannel *channel = openChannelsPool[channel.name];
+//        PTPusherPrivateChannel *channel = openChannelsPool[channelIdentifier];
         NSMutableArray *subscribedVCsToChannel = subscribedVCPool[channel.name];
         
         for (UIViewController *vc in subscribedVCsToChannel) {
@@ -90,7 +91,8 @@ static NSMutableDictionary * subscribedVCPool;
         subscribedVCPool[channel.name] = subscribedVCsToChannel;
     } else {
         //don't have a subscription for this channel
-        PTPusherPrivateChannel *newChannel = [self.client subscribeToPrivateChannelNamed:channelIdentifier];
+        PTPusherChannel *newChannel = [self.client subscribeToChannelNamed:channelIdentifier];
+//        PTPusherPrivateChannel *newChannel = [self.client subscribeToPrivateChannelNamed:channelIdentifier];
         openChannelsPool[channelIdentifier] = newChannel;
         subscribedVCPool[newChannel.name] = [[NSMutableArray alloc] initWithObjects:subscriptor, nil];
     }
@@ -98,7 +100,8 @@ static NSMutableDictionary * subscribedVCPool;
 
 - (void)unsubscribeToChannel:(NSString *)channelIdentifier viewController:(UIViewController *)subscriptor
 {
-    PTPusherPrivateChannel *channel = openChannelsPool[channelIdentifier];
+//    PTPusherPrivateChannel *channel = openChannelsPool[channelIdentifier];
+    PTPusherChannel *channel = openChannelsPool[channelIdentifier];
     
     if (channel) {
         NSMutableArray *subscriptors = (NSMutableArray *)subscribedVCPool[channel.name];
@@ -158,25 +161,33 @@ static NSMutableDictionary * subscribedVCPool;
     [channel bindToEventNamed:@"redcard"
               handleWithBlock:^(PTPusherEvent *channelEvent) {
                   
-                  [Match addEvent:channelEvent.data];
+                  MatchEvent *event = [[MatchEvent alloc] initWithDictionary:channelEvent.data matchId:channel.name eventType:MatchEventTypeRedCard];
+                  
+                  [Match addEvent:event];
                   [[NSNotificationCenter defaultCenter] postNotificationName:@"newEvent" object:channelEvent.channel];
               }];
     [channel bindToEventNamed:@"yellowcard"
               handleWithBlock:^(PTPusherEvent *channelEvent) {
                   
-                  [Match addEvent:channelEvent.data];
+                  MatchEvent *event = [[MatchEvent alloc] initWithDictionary:channelEvent.data matchId:channel.name eventType:MatchEventTypeYellowCard];
+                  
+                  [Match addEvent:event];
                   [[NSNotificationCenter defaultCenter] postNotificationName:@"newEvent" object:channelEvent.channel];
               }];
     [channel bindToEventNamed:@"goal"
               handleWithBlock:^(PTPusherEvent *channelEvent) {
                   
-                  [Match addEvent:channelEvent.data];
+                  MatchEvent *event = [[MatchEvent alloc] initWithDictionary:channelEvent.data matchId:channel.name eventType:MatchEventTypeGoal];
+                  
+                  [Match addEvent:event];
                   [[NSNotificationCenter defaultCenter] postNotificationName:@"newEvent" object:channelEvent.channel];
               }];
     [channel bindToEventNamed:@"injury"
               handleWithBlock:^(PTPusherEvent *channelEvent) {
                   
-                  [Match addEvent:channelEvent.data];
+                  MatchEvent *event = [[MatchEvent alloc] initWithDictionary:channelEvent.data matchId:channel.name eventType:MatchEventTypeInjury];
+                  
+                  [Match addEvent:event];
                   [[NSNotificationCenter defaultCenter] postNotificationName:@"newEvent" object:channelEvent.channel];
               }];
 }
@@ -184,8 +195,10 @@ static NSMutableDictionary * subscribedVCPool;
 - (void)pusher:(PTPusher *)pusher didUnsubscribeFromChannel:(PTPusherChannel *)channel
 {
     for (NSString *weevIdentifier in [openChannelsPool allKeys]) {
-        PTPusherPrivateChannel *auxChannel = openChannelsPool[weevIdentifier];
         
+//        PTPusherPrivateChannel *auxChannel = openChannelsPool[weevIdentifier];
+        PTPusherChannel *auxChannel = openChannelsPool[weevIdentifier];
+
         if ([channel.name isEqualToString:auxChannel.name]) {
             [openChannelsPool removeObjectForKey:weevIdentifier];
         }
@@ -201,7 +214,8 @@ static NSMutableDictionary * subscribedVCPool;
 - (void)pusher:(PTPusher *)pusher didFailToSubscribeToChannel:(PTPusherChannel *)channel withError:(NSError *)error
 {
     for (NSString *weevIdentifier in [openChannelsPool allKeys]) {
-        PTPusherPrivateChannel *auxChannel = openChannelsPool[weevIdentifier];
+//        PTPusherPrivateChannel *auxChannel = openChannelsPool[weevIdentifier];
+        PTPusherChannel *auxChannel = openChannelsPool[weevIdentifier];
         
         if ([channel.name isEqualToString:auxChannel.name]) {
             [openChannelsPool removeObjectForKey:weevIdentifier];

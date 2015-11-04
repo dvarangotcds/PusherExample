@@ -10,9 +10,16 @@
 
 @implementation MatchEvent
 
-- (MatchEvent *)initWithDictionary:(NSDictionary *)dictionary
-{
+- (MatchEvent *)initWithDictionary:(NSDictionary *)dictionary matchId:(NSString *)matchId eventType:(MatchEventType)eventType{
     self = [super init];
+    
+    if (self) {
+        self.matchId = matchId;
+        self.eventType = eventType;
+        self.minute = [dictionary[@"eventTime"] integerValue];
+        self.eventDescription = dictionary[@"eventDescription"];
+        self.team = [dictionary[@"eventTeam"] integerValue];
+    }
     
     return self;
 }

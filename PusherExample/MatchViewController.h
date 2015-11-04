@@ -11,5 +11,7 @@
 
 @interface MatchViewController : UIViewController
 @property (nonatomic, strong) NSString *matchId;
+- (IBAction)generate:(id)sender;
+
 
 @end

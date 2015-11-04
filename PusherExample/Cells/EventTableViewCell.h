@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface EventTableViewCell : UITableViewCell
-@property (weak, nonatomic) IBOutlet UILabel *minuto;
+@property (weak, nonatomic) IBOutlet UILabel *minute;
 @property (weak, nonatomic) IBOutlet UILabel *eventDescription;
 @property (weak, nonatomic) IBOutlet UIImageView *eventImage;
 

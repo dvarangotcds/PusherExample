@@ -33,9 +33,9 @@
                                                       object:nil
                                                        queue:[NSOperationQueue mainQueue]
                                                   usingBlock:^(NSNotification * _Nonnull note) {
-                                                      Match *match = [Match matchWithId:((Match *)note.object).matchId];
+                                                      Match *match = [Match matchWithId:(NSString *)note.object];
                                                       MatchEvent *event = match.events.lastObject;
-                                                      wself.latestEvent.text = [NSString stringWithFormat:@"Event: %@, min %i", event.eventDescription, (int)event.minute];
+                                                      wself.latestEvent.text = [NSString stringWithFormat:@"Match: %@ - %@, min %i", event.matchId, event.eventDescription, (int)event.minute];
                                                   }];
 }
 
