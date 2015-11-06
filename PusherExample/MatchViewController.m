@@ -9,6 +9,7 @@
 #import "MatchViewController.h"
 #import "EventTableViewCell.h"
 #import "MatchEvent.h"
+#import <AFNetworking/AFHTTPRequestOperation.h>
 
 @interface MatchViewController ()
 
@@ -41,10 +42,58 @@
                                                   }];
 }
 
-
 - (IBAction)generate:(id)sender
 {
+    NSArray *events = @[@"goal",@"redcard",@"yellowcard",@"injury"];
+    NSArray *descriptions = @[@"Torres",@"\"perro\" Zanetti",@"Cavani",@"Cacha",@"Julio Rios",@"Collazo",@"J Olivera",@"el otro",@"Luis Miguel",@"el 9"];
+    NSDictionary *eventInfo = @{
+                                @"matchId":self.matchId,
+                                @"eventName":[events objectAtIndex:arc4random() % [events count]],
+                                @"eventDescription":[descriptions objectAtIndex:arc4random() % [descriptions count]],
+                                @"eventTime":[NSString stringWithFormat:@"%i", arc4random() % 90]
+                                };
     
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:@"192.168.10.86:3000/event"]
+                                                                cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                            timeoutInterval:60];
+    
+    NSMutableDictionary *HTTPHeaders = [NSMutableDictionary dictionary];
+    
+    HTTPHeaders[@"Accept"] = @"application/json";
+    
+    request.allHTTPHeaderFields = HTTPHeaders;
+    request.HTTPMethod = @"POST";
+    
+    if (eventInfo) {
+        NSError *error = nil;
+        NSData *data = [NSJSONSerialization dataWithJSONObject:eventInfo options:kNilOptions error:&error];
+        
+        NSAssert(error == nil, @"Failed to serialize JSON object");
+        
+        if (!error) {
+            request.HTTPBody = data;
+        }
+    }
+    
+    AFHTTPRequestOperation *op = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+    [op setCompletionBlockWithSuccess:^(AFHTTPRequestOperation * _Nonnull operation, id  _Nonnull responseObject) {
+        ;
+    } failure:^(AFHTTPRequestOperation * _Nonnull operation, NSError * _Nonnull error) {
+        ;
+    }];
+    
+    [op start];
+}
+
+- (IBAction)resetMatch:(id)sender
+{
+    for (Match *match in [Match matchs]) {
+        if ([match.matchId isEqualToString:self.matchId]) {
+            [match.events removeAllObjects];
+        }
+    }
+    
+    [self.eventsTableView reloadData];
 }
 
 #pragma mark - UITableViewDataSource methods

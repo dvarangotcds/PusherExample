@@ -10,8 +10,9 @@
 #import "Match.h"
 
 @interface MatchViewController : UIViewController
-@property (nonatomic, strong) NSString *matchId;
-- (IBAction)generate:(id)sender;
 
+@property (nonatomic, strong) NSString *matchId;
+
+- (IBAction)generate:(id)sender;
 
 @end

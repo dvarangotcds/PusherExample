@@ -91,6 +91,13 @@
     [op start];
 }
 
+- (IBAction)resetMatches:(id)sender
+{
+    for (Match *match in [Match matchs]) {
+        [match.events removeAllObjects];
+    }
+}
+
 #pragma mark - UITableViewDataSource methods
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
