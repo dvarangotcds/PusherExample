@@ -26,7 +26,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     [self.matchsTableView registerNib:[UINib nibWithNibName:@"MatchTableViewCell" bundle:nil] forCellReuseIdentifier:@"matchCell"];
-    
+    self.latestEvent.text = @"";
     __weak ViewController *wself = self;
     
     [[NSNotificationCenter defaultCenter] addObserverForName:@"newEvent"
@@ -35,7 +35,12 @@
                                                   usingBlock:^(NSNotification * _Nonnull note) {
                                                       Match *match = [Match matchWithId:(NSString *)note.object];
                                                       MatchEvent *event = match.events.lastObject;
-                                                      wself.latestEvent.text = [NSString stringWithFormat:@"Match: %@ - %@, min %i", event.matchId, event.eventDescription, (int)event.minute];
+                                                      dispatch_async(dispatch_get_main_queue(), ^{
+                                                          wself.latestEvent.text = [NSString stringWithFormat:@"%@: %@ - %@, min %i", event.matchId, [MatchEvent stringFromEventType:event.eventType], event.eventDescription, (int)event.minute];
+                                                      });
+                                                      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                                                          wself.latestEvent.text = @"";
+                                                      });
                                                   }];
 }
 
@@ -141,9 +146,11 @@
     if (!sender.isOn) {
         [[PusherController sharedInstance] unsubscribeToChannel:((Match *)[[Match matchs] objectAtIndex:sender.tag]).matchId
                                                  viewController:self];
+        [(Match *)[[Match matchs] objectAtIndex:sender.tag] setNotificationsEnabled:NO];
     } else {
         [[PusherController sharedInstance] subscribeToChannel:((Match *)[[Match matchs] objectAtIndex:sender.tag]).matchId
                                                viewController:self];
+         [(Match *)[[Match matchs] objectAtIndex:sender.tag] setNotificationsEnabled:YES];
     }
 }
 

@@ -19,7 +19,14 @@ static NSMutableArray * matchPool;
         matchPool = [[NSMutableArray alloc] initWithObjects:[[Match alloc] initWithId:@"M1"  team1:@"Uruguay" team2:@"Argentina" enabled:NO],
                      [[Match alloc] initWithId:@"M2"  team1:@"Bayern Munchen" team2:@"Villa Teresa" enabled:NO],
                      [[Match alloc] initWithId:@"M3"  team1:@"Barcelona" team2:@"Sala de arriba" enabled:NO],
-                     [[Match alloc] initWithId:@"M4"  team1:@"Uruguay" team2:@"Argentina" enabled:NO], nil];
+                     [[Match alloc] initWithId:@"M4"  team1:@"Uruguay" team2:@"Argentina" enabled:NO],
+                     [[Match alloc] initWithId:@"M5"  team1:@"Barcelona" team2:@"Sala de arriba" enabled:NO],
+                     [[Match alloc] initWithId:@"M6"  team1:@"Barcelona" team2:@"Sala de arriba" enabled:NO],
+                     [[Match alloc] initWithId:@"M7"  team1:@"Barcelona" team2:@"Sala de arriba" enabled:NO],
+                     [[Match alloc] initWithId:@"M8"  team1:@"Barcelona" team2:@"Sala de arriba" enabled:NO],
+                     [[Match alloc] initWithId:@"M9"  team1:@"Barcelona" team2:@"Sala de arriba" enabled:NO],
+                     [[Match alloc] initWithId:@"M10"  team1:@"Barcelona" team2:@"Sala de arriba" enabled:NO],
+                     nil];
     }
 }
 

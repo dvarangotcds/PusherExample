@@ -24,4 +24,20 @@
     return self;
 }
 
++ (NSString *)stringFromEventType:(MatchEventType)eventType
+{
+    switch (eventType) {
+        case MatchEventTypeGoal:
+            return @"goal";
+        case MatchEventTypeInjury:
+            return @"injury";
+        case MatchEventTypeRedCard:
+            return @"red card";
+        case MatchEventTypeYellowCard:
+            return @"yellow card";
+        default:
+            return @"";
+    }
+}
+
 @end

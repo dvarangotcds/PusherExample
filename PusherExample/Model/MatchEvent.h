@@ -24,5 +24,6 @@ typedef enum {
 @property (nonatomic) MatchEventType eventType;
 
 - (MatchEvent *)initWithDictionary:(NSDictionary *)dictionary matchId:(NSString *)matchId eventType:(MatchEventType)eventType;
++ (NSString *)stringFromEventType:(MatchEventType)eventType;
 
 @end
